@@ -6,7 +6,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/blog")
-public class Blog {
+public class HelloBlog {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
