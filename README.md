@@ -1,5 +1,7 @@
 <a name="readme-top"></a>
 
+![Quarkus](readme-images/quarkus_project_banner.png)
+
 # Blog REST Service Project
 
 Simple REST Service application.
