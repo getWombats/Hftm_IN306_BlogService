@@ -30,7 +30,7 @@ public class BlogService {
         }
 
         List<Blog> blogs = blogQuery.page(Page.ofSize(20)).list();
-        Log.info("Returning " + blogs.size() + " blogs");
+        Log.info("Returning " + blogs.size() + " blogs.");
         return blogs;
     }
 
@@ -39,8 +39,76 @@ public class BlogService {
     }
 
     @Transactional
-    public void addBlog(Blog blog) {
-        Log.info("Adding blog " + blog.getTitle());
+    public Blog addBlog(Blog blog) {
+
         blogRepository.persist(blog);
+
+        Log.info("New blog with id " + blog.getId() + " successfully added.");
+
+        return blog;
+    }
+
+    @Transactional
+    public Blog deleteBlog(long id) {
+
+        Blog blogToBeDeleted = blogRepository.findById(id);
+
+        if (blogToBeDeleted != null) {
+            blogRepository.delete(blogToBeDeleted);
+
+            Log.info("Blog (id " + id + ") successfully deleted");
+
+            return blogToBeDeleted;
+        } else {
+            Log.warn("Blog with id " + id + " not found. No deletion performed.");
+
+            return null;
+        }
+    }
+
+    @Transactional
+    public Blog replaceBlog(Long id, Blog newBlog) {
+
+        Blog existingBlog = blogRepository.findById(id);
+
+        if (existingBlog != null) {
+
+            existingBlog.setTitle(newBlog.getTitle());
+            existingBlog.setContent(newBlog.getContent());
+            blogRepository.persist(existingBlog);
+
+            Log.info("Replaced blog with id " + id);
+
+            return existingBlog;
+        } else {
+            Log.warn("Blog with id " + id + " not found. No replacement performed.");
+
+            return null;
+        }
+    }
+
+    @Transactional
+    public Blog updateBlog(long id, Blog updatedBlog) {
+
+        Blog blogToUpdate = blogRepository.findById(id);
+
+        if (blogToUpdate != null) {
+            if (!updatedBlog.getTitle().isEmpty()) {
+                blogToUpdate.setTitle(updatedBlog.getTitle());
+            }
+            if (!updatedBlog.getContent().isEmpty()) {
+                blogToUpdate.setContent(updatedBlog.getContent());
+            }
+
+            blogRepository.persist(blogToUpdate);
+
+            Log.info("Blog with id " + id + " successfully updated.");
+
+            return blogToUpdate;
+        } else {
+            Log.warn("Blog with id " + id + " not found. No update performed.");
+        }
+
+        return null;
     }
 }
