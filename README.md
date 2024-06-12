@@ -113,3 +113,4 @@ ___
 * [ ] Put all opening curly braces on new line
 * [ ] Some tests still fail, fix coming soon
 * [ ] Complete unit tests
+* [ ] Implement authentication
