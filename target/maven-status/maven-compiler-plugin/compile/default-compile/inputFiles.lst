@@ -1,5 +1,5 @@
-C:\01_DevWorkspace\Java Web\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\control\BlogService.java
-C:\01_DevWorkspace\Java Web\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\entity\Blog.java
-C:\01_DevWorkspace\Java Web\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\repository\BlogRepository.java
-C:\01_DevWorkspace\Java Web\Hftm_IN306_BlogService\src\main\java\ch\hftm\HelloBlog.java
-C:\01_DevWorkspace\Java Web\Hftm_IN306_BlogService\src\main\java\ch\hftm\HelloQuarkus.java
+C:\01_DevWorkspace\Java Quarkus\01_HftmProjects\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\boundary\BlogRessource.java
+C:\01_DevWorkspace\Java Quarkus\01_HftmProjects\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\control\AppStartup.java
+C:\01_DevWorkspace\Java Quarkus\01_HftmProjects\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\control\BlogService.java
+C:\01_DevWorkspace\Java Quarkus\01_HftmProjects\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\entity\Blog.java
+C:\01_DevWorkspace\Java Quarkus\01_HftmProjects\Hftm_IN306_BlogService\src\main\java\ch\hftm\blog\repository\BlogRepository.java
