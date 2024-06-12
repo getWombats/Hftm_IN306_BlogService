@@ -2,12 +2,14 @@ package ch.hftm.blog.boundary;
 
 import java.net.URI;
 import java.util.Optional;
+
 import ch.hftm.blog.control.BlogService;
 import ch.hftm.blog.entity.Blog;
 import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -53,8 +55,7 @@ public class BlogRessource {
     }
 
     @DELETE
-    @Path("{id}")
-    public Response deleteBlog(@PathParam("id") Long id) {
+    public Response deleteBlog(@HeaderParam("id") Long id) {
 
         if(id == null) {
             return Response.status(Status.BAD_REQUEST).build();
@@ -91,10 +92,9 @@ public class BlogRessource {
     }
 
     @PATCH
-    @Path("{id}")
-    public Response patchBlog(@PathParam("id") Long id, Blog blog) {
+    public Response patchBlog(@HeaderParam("id") Long id, Blog blog) {
         
-        if(blog == null || id == null || id != blog.getId()) {
+        if(blog == null || id == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         
