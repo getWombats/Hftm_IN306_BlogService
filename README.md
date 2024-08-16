@@ -36,19 +36,19 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 2. Just type following command in your VS Code Terminal:
 
 ```sh
-./mnvw quarkus:dev
+.\mnvw quarkus:dev
 ```
 
 ## Run Quarkus Tests
 
 Run all tests:
 ```sh
-./mvnw test
+.\mvnw test
 ```
 
 Clean build and run all tests:
 ```sh
-./mvnw clean test
+.\mvnw clean test
 ```
 
 ## API Documentation
