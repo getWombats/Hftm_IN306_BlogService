@@ -1,0 +1,5 @@
+ch\hftm\blog\boundary\BlogRessource.class
+ch\hftm\blog\control\AppStartup.class
+ch\hftm\blog\entity\Blog.class
+ch\hftm\blog\control\BlogService.class
+ch\hftm\blog\repository\BlogRepository.class
