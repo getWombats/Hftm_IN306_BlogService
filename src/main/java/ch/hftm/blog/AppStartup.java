@@ -1,5 +1,6 @@
-package ch.hftm.blog.control;
+package ch.hftm.blog;
 
+import ch.hftm.blog.control.BlogService;
 import ch.hftm.blog.model.entity.Blog;
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
