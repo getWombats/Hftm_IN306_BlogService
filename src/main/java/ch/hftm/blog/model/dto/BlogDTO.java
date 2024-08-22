@@ -1,5 +1,6 @@
 package ch.hftm.blog.model.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +17,8 @@ public class BlogDTO {
     private String title;
     @NotBlank(message="Empty content not allowed")
     private String content;
-    private Long ownerId;
-    private String ownerName;
+    private String authorName;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastEditedAt;
     private List<CommentDTO> comments;
 }
