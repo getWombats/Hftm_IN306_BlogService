@@ -1,8 +1,12 @@
-package ch.hftm.blog.entity;
+package ch.hftm.blog.model.entity;
+
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +18,12 @@ import lombok.NoArgsConstructor;
 public class Blog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
+    private String authorName;
 
-    public Blog(String title, String content) {
-        this.title = title;
-        this.content = content;
-    }
+    @OneToMany
+    private List<Comment> comments;
 }
