@@ -1,5 +1,6 @@
 package ch.hftm.blog.model.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -23,6 +24,8 @@ public class Blog {
     private String title;
     private String content;
     private String authorName;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastEditedAt;
 
     @OneToMany
     private List<Comment> comments;
