@@ -13,11 +13,10 @@ public class DtoConverter {
     
         public Blog fromBlogDto(BlogDTO dto) {
         Blog entity = new Blog();
-        // entity.setId(dto.getId());
+        entity.setId(dto.getId());
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
-        // entity.setOwnerId(dto.getOwnerId());
-        // entity.setOwnerName(dto.getOwnerName());
+        entity.setAuthorName(dto.getAuthorName());
         if(dto.getComments() != null){
             entity.setComments(dto.getComments().stream().map(this::fromCommentDto).toList());
         }
@@ -29,8 +28,7 @@ public class DtoConverter {
         dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
         dto.setContent(entity.getContent());
-        // dto.setOwnerId(entity.getOwnerId());
-        // dto.setOwnerName(entity.getOwnerName());
+        dto.setAuthorName(entity.getAuthorName());
         if(entity.getComments() != null){
             dto.setComments(entity.getComments().stream().map(this::toCommentDto).toList());
         }
@@ -47,7 +45,7 @@ public class DtoConverter {
 
     public Comment fromCommentDto(CommentDTO dto) {
         Comment entity = new Comment();
-        // entity.setId(dto.getId());
+        entity.setId(dto.getId());
         entity.setAuthorName(dto.getAuthorName());
         entity.setContent(dto.getContent());
         entity.setCreatedAt(dto.getCreatedAt());
