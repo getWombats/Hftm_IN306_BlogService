@@ -1,10 +1,14 @@
 package ch.hftm.blog.control;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import ch.hftm.blog.model.dto.BlogDTO;
 import ch.hftm.blog.model.entity.Blog;
 import ch.hftm.blog.repository.BlogRepository;
+import ch.hftm.blog.repository.CommentRepository;
+import ch.hftm.blog.service.DtoConverter;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Page;
@@ -17,11 +21,17 @@ public class BlogService {
     @Inject
     BlogRepository blogRepository;
 
-    public List<Blog> getBlogs() {
+    @Inject
+    CommentRepository commentRepository;
+
+    @Inject
+    DtoConverter dtoConverter;
+
+    public List<BlogDTO> getBlogs() {
         return this.getBlogs(Optional.empty(), Optional.empty());
     }
 
-    public List<Blog> getBlogs(Optional<String> searchString, Optional<Long> page) {
+    public List<BlogDTO> getBlogs(Optional<String> searchString, Optional<Long> page) {
         PanacheQuery<Blog> blogQuery;
         if (searchString.isEmpty()) {
             blogQuery = blogRepository.findAll();
@@ -30,85 +40,79 @@ public class BlogService {
         }
 
         List<Blog> blogs = blogQuery.page(Page.ofSize(20)).list();
-        Log.info("Returning " + blogs.size() + " blogs.");
-        return blogs;
+        return dtoConverter.toBlogDtoCollection(blogs);
     }
 
-    public Blog getBlogById(long id) {
-        return blogRepository.findById(id);
-    }
-
-    @Transactional
-    public Blog addBlog(Blog blog) {
-
-        blogRepository.persist(blog);
-
-        Log.info("New blog with id " + blog.getId() + " successfully added.");
-
-        return blog;
+    public BlogDTO getBlogById(long blogId) {
+        return dtoConverter.toBlogDto(blogRepository.findById(blogId));
     }
 
     @Transactional
-    public Blog deleteBlog(long id) {
+    public BlogDTO addBlog(BlogDTO blogDto) {
+        blogDto.setCreatedAt(LocalDateTime.now());
 
-        Blog blogToBeDeleted = blogRepository.findById(id);
-
-        if (blogToBeDeleted != null) {
-            blogRepository.delete(blogToBeDeleted);
-
-            Log.info("Blog (id " + id + ") successfully deleted");
-
-            return blogToBeDeleted;
-        } else {
-            Log.warn("Blog with id " + id + " not found. No deletion performed.");
-
+        try{
+            blogRepository.persist(dtoConverter.fromBlogDto(blogDto));
+        }
+        catch (Exception e){
+            Log.error("Error while persisting blog: " + e.getMessage());
             return null;
         }
+
+        return blogDto;
     }
 
     @Transactional
-    public Blog replaceBlog(Long id, Blog newBlog) {
+    public BlogDTO deleteBlog(long blogId) {
 
-        Blog existingBlog = blogRepository.findById(id);
+        Blog blogToBeDeleted = blogRepository.findById(blogId);
 
-        if (existingBlog != null) {
-
-            existingBlog.setTitle(newBlog.getTitle());
-            existingBlog.setContent(newBlog.getContent());
-            blogRepository.persist(existingBlog);
-
-            Log.info("Replaced blog with id " + id);
-
-            return existingBlog;
-        } else {
-            Log.warn("Blog with id " + id + " not found. No replacement performed.");
-
+        if (blogToBeDeleted == null) {
+            Log.warn("Blog with id " + blogId + " not found. No deletion performed.");
             return null;
         }
+
+        blogRepository.delete(blogToBeDeleted);
+        return dtoConverter.toBlogDto(blogToBeDeleted);
     }
 
     @Transactional
-    public Blog updateBlog(long id, Blog updatedBlog) {
+    public BlogDTO replaceBlog(Long blogId, BlogDTO newBlog) {
 
-        Blog blogToUpdate = blogRepository.findById(id);
+        Blog existingBlog = blogRepository.findById(blogId);
 
-        if (blogToUpdate != null) {
-            if (!updatedBlog.getTitle().isEmpty()) {
-                blogToUpdate.setTitle(updatedBlog.getTitle());
-            }
-            if (!updatedBlog.getContent().isEmpty()) {
-                blogToUpdate.setContent(updatedBlog.getContent());
-            }
-
-            blogRepository.persist(blogToUpdate);
-
-            Log.info("Blog with id " + id + " successfully updated.");
-
-            return blogToUpdate;
-        } else {
-            Log.warn("Blog with id " + id + " not found. No update performed.");
+        if (existingBlog == null) {
+            Log.warn("Blog with id " + blogId + " not found. No replacement performed.");
+            return null;
         }
 
-        return null;
+        existingBlog.setTitle(newBlog.getTitle());
+        existingBlog.setContent(newBlog.getContent());
+        existingBlog.setAuthorName(newBlog.getAuthorName());
+        existingBlog.setCreatedAt(newBlog.getCreatedAt());
+        existingBlog.setLastEditedAt(newBlog.getLastEditedAt());
+        blogRepository.persist(existingBlog);
+
+        return dtoConverter.toBlogDto(existingBlog);
+    }
+
+    @Transactional
+    public BlogDTO updateBlog(long blogId, BlogDTO updatedBlog) {
+
+        Blog blogToUpdate = blogRepository.findById(blogId);
+
+        if (blogToUpdate == null){
+            Log.warn("Blog with id " + blogId + " not found. No update performed.");
+            return null;
+        }
+
+        updatedBlog.setLastEditedAt(LocalDateTime.now());
+
+        blogToUpdate.setTitle(updatedBlog.getTitle());
+        blogToUpdate.setContent(updatedBlog.getContent());
+        blogToUpdate.setLastEditedAt(updatedBlog.getLastEditedAt());
+
+        blogRepository.persist(blogToUpdate);
+        return dtoConverter.toBlogDto(blogToUpdate);
     }
 }
