@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import ch.hftm.blog.entity.Blog;
+import ch.hftm.blog.model.entity.Blog;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 

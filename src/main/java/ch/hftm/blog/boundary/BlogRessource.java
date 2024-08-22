@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Optional;
 
 import ch.hftm.blog.control.BlogService;
-import ch.hftm.blog.entity.Blog;
+import ch.hftm.blog.model.entity.Blog;
 import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;

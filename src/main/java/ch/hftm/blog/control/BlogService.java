@@ -3,7 +3,7 @@ package ch.hftm.blog.control;
 import java.util.List;
 import java.util.Optional;
 
-import ch.hftm.blog.entity.Blog;
+import ch.hftm.blog.model.entity.Blog;
 import ch.hftm.blog.repository.BlogRepository;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.logging.Log;
