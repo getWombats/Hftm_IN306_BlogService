@@ -1,6 +1,7 @@
 package ch.hftm.blog.control;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,22 +45,37 @@ public class BlogService {
     }
 
     public BlogDTO getBlogById(long blogId) {
-        return dtoConverter.toBlogDto(blogRepository.findById(blogId));
+        Blog foundBlog = blogRepository.findById(blogId);
+
+        if (foundBlog == null) {
+            Log.warn("Blog with id " + blogId + " not found.");
+            return null;
+        }
+
+        return dtoConverter.toBlogDto(foundBlog);
     }
 
     @Transactional
     public BlogDTO addBlog(BlogDTO blogDto) {
+
         blogDto.setCreatedAt(LocalDateTime.now());
 
-        try{
+        try {
             blogRepository.persist(dtoConverter.fromBlogDto(blogDto));
-        }
-        catch (Exception e){
-            Log.error("Error while persisting blog: " + e.getMessage());
+        } catch (Exception e) {
+            Log.error("Error while persisting blog:\n" + e.getClass().getName() + "\n" + e.getMessage());
             return null;
         }
 
-        return blogDto;
+        Blog addedBlog = blogRepository.find("title = ?1 and content = ?2 and authorName = ?3",
+                blogDto.getTitle(), blogDto.getContent(), blogDto.getAuthorName()).firstResult();
+
+        if (addedBlog == null) {
+            Log.error("Error while retrieving added blog.");
+            return null;
+        }
+
+        return dtoConverter.toBlogDto(addedBlog);
     }
 
     @Transactional
@@ -77,20 +93,33 @@ public class BlogService {
     }
 
     @Transactional
-    public BlogDTO replaceBlog(Long blogId, BlogDTO newBlog) {
+    public BlogDTO replaceBlog(Long replaceBlogId, Long replacementBlogId) {
 
-        Blog existingBlog = blogRepository.findById(blogId);
+        Blog existingBlog = blogRepository.findById(replaceBlogId);
 
         if (existingBlog == null) {
-            Log.warn("Blog with id " + blogId + " not found. No replacement performed.");
+            Log.warn("Blog to replace with id " + replaceBlogId + " not found. No replacement performed.");
             return null;
         }
 
-        existingBlog.setTitle(newBlog.getTitle());
-        existingBlog.setContent(newBlog.getContent());
-        existingBlog.setAuthorName(newBlog.getAuthorName());
-        existingBlog.setCreatedAt(newBlog.getCreatedAt());
-        existingBlog.setLastEditedAt(newBlog.getLastEditedAt());
+        Blog replacementBlog = blogRepository.findById(replacementBlogId);
+
+        if (replacementBlog == null) {
+            Log.warn("Replacing blog with id " + replacementBlogId + " not found. No replacement performed.");
+            return null;
+        }
+
+        existingBlog.setTitle(replacementBlog.getTitle());
+        existingBlog.setContent(replacementBlog.getContent());
+        existingBlog.setAuthorName(replacementBlog.getAuthorName());
+        existingBlog.setCreatedAt(replacementBlog.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
+
+        if(replacementBlog.getLastEditedAt() != null){
+            existingBlog.setLastEditedAt(replacementBlog.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
+        } else {
+            existingBlog.setLastEditedAt(null);
+        }
+        
         blogRepository.persist(existingBlog);
 
         return dtoConverter.toBlogDto(existingBlog);
@@ -101,7 +130,7 @@ public class BlogService {
 
         Blog blogToUpdate = blogRepository.findById(blogId);
 
-        if (blogToUpdate == null){
+        if (blogToUpdate == null) {
             Log.warn("Blog with id " + blogId + " not found. No update performed.");
             return null;
         }
@@ -110,7 +139,7 @@ public class BlogService {
 
         blogToUpdate.setTitle(updatedBlog.getTitle());
         blogToUpdate.setContent(updatedBlog.getContent());
-        blogToUpdate.setLastEditedAt(updatedBlog.getLastEditedAt());
+        blogToUpdate.setLastEditedAt(updatedBlog.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
 
         blogRepository.persist(blogToUpdate);
         return dtoConverter.toBlogDto(blogToUpdate);
