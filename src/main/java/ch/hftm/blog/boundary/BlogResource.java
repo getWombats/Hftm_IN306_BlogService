@@ -137,7 +137,7 @@ public class BlogResource {
 
     @PATCH
     @Path("{blogId}")
-    public Response updatehBlog(Long blogId, @Valid BlogDTO blog) {
+    public Response updateBlog(Long blogId, @Valid BlogDTO blog) {
 
         if (blogId == null) {
             return Response.status(Status.BAD_REQUEST).entity("No blog-id provided.").build();
