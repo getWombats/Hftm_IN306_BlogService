@@ -31,7 +31,7 @@ import jakarta.ws.rs.core.UriInfo;
 // @DenyAll
 @Path("blogs")
 @Consumes("application/json")
-public class BlogRessource {
+public class BlogResource {
 
     @Inject
     BlogService blogService;
