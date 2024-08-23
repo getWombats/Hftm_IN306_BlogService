@@ -1,5 +1,11 @@
-ch\hftm\blog\boundary\BlogRessource.class
-ch\hftm\blog\control\AppStartup.class
-ch\hftm\blog\entity\Blog.class
-ch\hftm\blog\control\BlogService.class
+ch\hftm\blog\repository\CommentRepository.class
+ch\hftm\blog\model\dto\CommentDTO.class
+ch\hftm\blog\model\entity\Blog.class
+ch\hftm\blog\model\dto\BlogDTO.class
+ch\hftm\blog\model\entity\Comment.class
 ch\hftm\blog\repository\BlogRepository.class
+ch\hftm\blog\service\DtoConverter.class
+ch\hftm\blog\boundary\BlogRessource.class
+ch\hftm\blog\control\CommentService.class
+ch\hftm\blog\AppStartup.class
+ch\hftm\blog\control\BlogService.class
