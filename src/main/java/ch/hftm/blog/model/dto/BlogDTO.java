@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BlogDTO {
     private Long id;
-    @NotBlank(message="Empty title not allowed")
+    @NotBlank(message = "Title must not be empty")
     private String title;
-    @NotBlank(message="Empty content not allowed")
+    @NotBlank(message = "Content must not be empty")
     private String content;
     private String authorName;
     private LocalDateTime createdAt;

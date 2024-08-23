@@ -12,11 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentDTO {
     private Long id;
-    @NotBlank(message="Empty author name not allowed")
+    @NotBlank(message = "Author name must not be empty")
     private String authorName;
-    @NotBlank(message="Empty content not allowed")
+    @NotBlank(message = "Content must not be empty")
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime lastEditedAt;
 }
-
