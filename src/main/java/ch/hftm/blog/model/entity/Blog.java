@@ -1,6 +1,6 @@
 package ch.hftm.blog.model.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -17,15 +17,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Blog {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
     private String authorName;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastEditedAt;
+    private Instant createdAt;
+    private Instant lastEditedAt;
 
     @OneToMany
     private List<Comment> comments;

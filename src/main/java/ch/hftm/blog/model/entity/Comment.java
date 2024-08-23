@@ -1,6 +1,6 @@
 package ch.hftm.blog.model.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +22,6 @@ public class Comment {
 
     private String authorName;
     private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastEditedAt;
+    private Instant createdAt;
+    private Instant lastEditedAt;
 }
