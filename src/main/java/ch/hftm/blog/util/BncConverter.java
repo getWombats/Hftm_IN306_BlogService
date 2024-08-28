@@ -1,117 +1,149 @@
-package ch.hftm.blog.service;
+package ch.hftm.blog.util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ch.hftm.blog.model.dto.BlogPostDTO;
 import ch.hftm.blog.model.dto.CommentDTO;
 import ch.hftm.blog.model.entity.BlogPost;
 import ch.hftm.blog.model.entity.Comment;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.validation.Valid;
 
-@ApplicationScoped
 public class BncConverter {
 
-    public BlogPost fromBlogDto(BlogPostDTO dto) {
-        BlogPost entity = new BlogPost();
-
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
+    public static List<BlogPostDTO> toBlogDtoCollection(
+            List<BlogPost> blogs) {
+        if (blogs == null || blogs.isEmpty()) {
+            return null;
         }
 
-        entity.setTitle(dto.getTitle());
-        entity.setContent(dto.getContent());
-        entity.setAuthorName(dto.getAuthorName());
-
-        if (dto.getCreatedAt() != null) {
-            entity.setCreatedAt(dto.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
-        }
-
-        if (dto.getLastEditedAt() != null) {
-            entity.setLastEditedAt(dto.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
-        }
-
-        if (dto.getComments() != null) {
-            entity.setComments(dto.getComments().stream().map(this::fromCommentDto).toList());
-        }
-
-        return entity;
+        return blogs.stream().map(blog -> new BlogPostDTO() {
+            {
+                setId(blog.getId());
+                setTitle(blog.getTitle());
+                setContent(blog.getContent());
+                setAuthor(blog.getAuthor());
+                setCreatedAt(blog.getCreatedAt());
+                setLastEditedAt(blog.getLastEditedAt());
+                setComments(toCommentDtoCollection(blog.getComments()));
+            }
+        }).collect(Collectors.toList());
     }
 
-    public BlogPostDTO toBlogDto(BlogPost entity) {
-        @Valid
-        BlogPostDTO dto = new BlogPostDTO();
-
-        dto.setId(entity.getId());
-        dto.setTitle(entity.getTitle());
-        dto.setContent(entity.getContent());
-        dto.setAuthorName(entity.getAuthorName());
-        dto.setCreatedAt(LocalDateTime.ofInstant(entity.getCreatedAt(), ZoneId.systemDefault()));
-
-        if (entity.getLastEditedAt() != null) {
-            dto.setLastEditedAt(LocalDateTime.ofInstant(entity.getLastEditedAt(), ZoneId.systemDefault()));
+    public static List<CommentDTO> toCommentDtoCollection(List<Comment> comments) {
+        if (comments == null || comments.isEmpty()) {
+            return null;
         }
 
-        if (entity.getComments() != null) {
-            dto.setComments(entity.getComments().stream().map(this::toCommentDto).toList());
+        return comments.stream().map(comment -> new CommentDTO() {
+            {
+                setId(comment.getId());
+                setCommentNumber(comment.getCommentNumber());
+                setBlogId(comment.getBlog().getId());
+                setContent(comment.getContent());
+                setAuthor(comment.getAuthor());
+                setCreatedAt(comment.getCreatedAt());
+                setLastEditedAt(comment.getLastEditedAt());
+            }
+        }).collect(Collectors.toList());
+    }
+
+    public static List<Comment> toCommentEntityCollection(List<CommentDTO> commentDTOs) {
+        if (commentDTOs == null || commentDTOs.isEmpty()) {
+            return null;
         }
 
-        return dto;
+        return commentDTOs.stream().map(commentDTO -> new Comment() {
+            {
+                setId(commentDTO.getId());
+                setCommentNumber(commentDTO.getCommentNumber());
+                setContent(commentDTO.getContent());
+                setAuthor(commentDTO.getAuthor());
+                setCreatedAt(commentDTO.getCreatedAt());
+                setLastEditedAt(commentDTO.getLastEditedAt());
+            }
+        }).collect(Collectors.toList());
     }
 
-    public Comment fromCommentDto(CommentDTO dto) {
-        Comment entity = new Comment();
-
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
+    public static BlogPostDTO toBlogDto(BlogPost blog) {
+        if (blog == null) {
+            return null;
         }
 
-        entity.setAuthorName(dto.getAuthorName());
-        entity.setContent(dto.getContent());
+        return new BlogPostDTO() {
+            {
+                setId(blog.getId());
+                setTitle(blog.getTitle());
+                setContent(blog.getContent());
+                setAuthor(blog.getAuthor());
+                setCreatedAt(blog.getCreatedAt());
+                setLastEditedAt(blog.getLastEditedAt());
+                setComments(toCommentDtoCollection(blog.getComments()));
+            }
+        };
+    }
 
-        if (dto.getCreatedAt() != null) {
-            entity.setCreatedAt(dto.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
+    public static BlogPost toBlogEntity(BlogPostDTO blogDTO) {
+        if (blogDTO == null) {
+            return null;
         }
 
-        if (dto.getLastEditedAt() != null) {
-            entity.setLastEditedAt(dto.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
+        return new BlogPost() {
+            {
+                setId(blogDTO.getId());
+                setTitle(blogDTO.getTitle());
+                setContent(blogDTO.getContent());
+                setAuthor(blogDTO.getAuthor());
+                setCreatedAt(blogDTO.getCreatedAt());
+                setLastEditedAt(blogDTO.getLastEditedAt());
+                setComments(toCommentEntityCollection(blogDTO.getComments()));
+            }
+        };
+    }
+
+    public static CommentDTO toCommentDto(Comment comment) {
+        if (comment == null) {
+            return null;
         }
 
-        return entity;
+        return new CommentDTO() {
+            {
+                setId(comment.getId());
+                setBlogId(comment.getBlog().getId());
+                setCommentNumber(comment.getCommentNumber());
+                setContent(comment.getContent());
+                setAuthor(comment.getAuthor());
+                setCreatedAt(comment.getCreatedAt());
+                setLastEditedAt(comment.getLastEditedAt());
+            }
+        };
     }
 
-    public CommentDTO toCommentDto(Comment entity) {
-        @Valid
-        CommentDTO dto = new CommentDTO();
-        dto.setId(entity.getId());
-        dto.setAuthorName(entity.getAuthorName());
-        dto.setContent(entity.getContent());
-        dto.setCreatedAt(LocalDateTime.ofInstant(entity.getCreatedAt(), ZoneId.systemDefault()));
-
-        if (entity.getLastEditedAt() != null) {
-            dto.setLastEditedAt(LocalDateTime.ofInstant(entity.getLastEditedAt(), ZoneId.systemDefault()));
+    public static Comment toCommentEntity(CommentDTO commentDTO) {
+        if (commentDTO == null) {
+            return null;
         }
 
-        return dto;
+        return new Comment() {
+            {
+                setId(commentDTO.getId());
+                setCommentNumber(commentDTO.getCommentNumber());
+                setContent(commentDTO.getContent());
+                setAuthor(commentDTO.getAuthor());
+                setCreatedAt(commentDTO.getCreatedAt());
+                setLastEditedAt(commentDTO.getLastEditedAt());
+            }
+        };
     }
 
-    public List<BlogPostDTO> toBlogDtoCollection(List<BlogPost> blogs) {
-        return blogs.stream().map(this::toBlogDto).toList();
-    }
+    public static List<Comment> setNewBlogReferenceOnComments(BlogPost newBlogForReference, List<Comment> comments) {
+        if (comments == null || comments.isEmpty()) {
+            return null;
+        }
 
-    public List<BlogPost> fromBlogDtoCollection(List<BlogPostDTO> blogDtos) {
-        return blogDtos.stream().map(this::fromBlogDto).toList();
-    }
+        for (Comment comment : comments) {
+            comment.setBlog(newBlogForReference);
+        }
 
-    public List<CommentDTO> toCommentDtoCollection(List<Comment> comments) {
-        return comments.stream().map(this::toCommentDto).toList();
+        return comments;
     }
-
-    public List<Comment> fromCommentDtoCollection(List<CommentDTO> commentDtos) {
-        return commentDtos.stream().map(this::fromCommentDto).toList();
-    }
-
 }
