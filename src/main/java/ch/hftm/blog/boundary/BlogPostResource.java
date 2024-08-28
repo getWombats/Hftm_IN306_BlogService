@@ -9,7 +9,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import ch.hftm.blog.control.BlogService;
 import ch.hftm.blog.control.CommentService;
-import ch.hftm.blog.model.dto.BlogDTO;
+import ch.hftm.blog.model.dto.BlogPostDTO;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ import jakarta.ws.rs.core.UriInfo;
 // @DenyAll
 @Path("blogs")
 @Consumes("application/json")
-public class BlogResource {
+public class BlogPostResource {
 
     @Inject
     BlogService blogService;
@@ -46,7 +46,7 @@ public class BlogResource {
     @PermitAll
     public Response getBlogs(@QueryParam("searchString") Optional<String> searchString,
             @QueryParam("page") Optional<Long> page) {
-        List<BlogDTO> blogDtos = blogService.getBlogs(searchString, page);
+        List<BlogPostDTO> blogDtos = blogService.getBlogs(searchString, page);
 
         if (blogDtos == null || blogDtos.isEmpty()) {
             return Response.status(Status.NOT_FOUND).entity("No blogs found.").build();
@@ -64,7 +64,7 @@ public class BlogResource {
             return Response.status(Status.BAD_REQUEST).entity("No blog-id provided.").build();
         }
 
-        BlogDTO foundBlog = blogService.getBlogById(blogId);
+        BlogPostDTO foundBlog = blogService.getBlogById(blogId);
 
         if (foundBlog == null) {
             return Response.status(Status.NOT_FOUND).entity("No blog with id " + blogId + "available.").build();
@@ -74,7 +74,7 @@ public class BlogResource {
     }
 
     @POST
-    public Response addBlog(@Valid BlogDTO blog, @Context UriInfo uriInfo) {
+    public Response addBlog(@Valid BlogPostDTO blog, @Context UriInfo uriInfo) {
 
         if (blog == null) {
             return Response.status(Status.BAD_REQUEST).entity("No blog provided.").build();
@@ -86,7 +86,7 @@ public class BlogResource {
         // blog.setAuthorName(username);
         // }
 
-        BlogDTO addedBlog = blogService.addBlog(blog);
+        BlogPostDTO addedBlog = blogService.addBlog(blog);
 
         if (addedBlog == null) {
             return Response.status(Status.NOT_MODIFIED).entity("Error while adding blog.").build();
@@ -104,7 +104,7 @@ public class BlogResource {
             return Response.status(Status.BAD_REQUEST).entity("No blog-id provided.").build();
         }
 
-        BlogDTO deletedBlog = blogService.deleteBlog(blogId);
+        BlogPostDTO deletedBlog = blogService.deleteBlog(blogId);
 
         if (deletedBlog == null) {
             return Response.status(Status.NOT_FOUND)
@@ -126,7 +126,7 @@ public class BlogResource {
             return Response.status(Status.BAD_REQUEST).entity("No blog-id in header provided.").build();
         }
 
-        BlogDTO replacedBlog = blogService.replaceBlog(replaceBlogId, blogId);
+        BlogPostDTO replacedBlog = blogService.replaceBlog(replaceBlogId, blogId);
 
         if (replacedBlog == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -137,7 +137,7 @@ public class BlogResource {
 
     @PATCH
     @Path("{blogId}")
-    public Response updateBlog(Long blogId, @Valid BlogDTO blog) {
+    public Response updateBlog(Long blogId, @Valid BlogPostDTO blog) {
 
         if (blogId == null) {
             return Response.status(Status.BAD_REQUEST).entity("No blog-id provided.").build();
@@ -147,7 +147,7 @@ public class BlogResource {
             return Response.status(Status.BAD_REQUEST).entity("No blog provided.").build();
         }
 
-        BlogDTO updatedBlog = blogService.updateBlog(blogId, blog);
+        BlogPostDTO updatedBlog = blogService.updateBlog(blogId, blog);
 
         if (updatedBlog == null) {
             return Response.status(Status.NOT_FOUND)

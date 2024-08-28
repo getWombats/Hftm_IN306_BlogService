@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BlogDTO {
+public class BlogPostDTO {
     private Long id;
     @NotBlank(message = "Title must not be empty")
     private String title;
