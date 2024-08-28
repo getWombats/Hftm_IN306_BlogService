@@ -1,6 +1,6 @@
 package ch.hftm.blog.model.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
@@ -9,16 +9,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class BlogPostDTO {
     private Long id;
     @NotBlank(message = "Title must not be empty")
     private String title;
     @NotBlank(message = "Content must not be empty")
     private String content;
-    private String authorName;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastEditedAt;
+    private String author;
+    private Instant createdAt;
+    private Instant lastEditedAt;
     private List<CommentDTO> comments;
 }
