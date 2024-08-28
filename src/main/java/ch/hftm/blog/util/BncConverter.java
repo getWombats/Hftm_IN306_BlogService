@@ -13,7 +13,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
 
 @ApplicationScoped
-public class DtoConverter {
+public class BncConverter {
 
     public BlogPost fromBlogDto(BlogPostDTO dto) {
         BlogPost entity = new BlogPost();
