@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import ch.hftm.blog.model.dto.BlogDTO;
+import ch.hftm.blog.model.dto.BlogPostDTO;
 import ch.hftm.blog.model.dto.CommentDTO;
-import ch.hftm.blog.model.entity.Blog;
+import ch.hftm.blog.model.entity.BlogPost;
 import ch.hftm.blog.model.entity.Comment;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
@@ -15,8 +15,8 @@ import jakarta.validation.Valid;
 @ApplicationScoped
 public class DtoConverter {
 
-    public Blog fromBlogDto(BlogDTO dto) {
-        Blog entity = new Blog();
+    public BlogPost fromBlogDto(BlogPostDTO dto) {
+        BlogPost entity = new BlogPost();
 
         if (dto.getId() != null) {
             entity.setId(dto.getId());
@@ -41,9 +41,9 @@ public class DtoConverter {
         return entity;
     }
 
-    public BlogDTO toBlogDto(Blog entity) {
+    public BlogPostDTO toBlogDto(BlogPost entity) {
         @Valid
-        BlogDTO dto = new BlogDTO();
+        BlogPostDTO dto = new BlogPostDTO();
 
         dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
@@ -98,11 +98,11 @@ public class DtoConverter {
         return dto;
     }
 
-    public List<BlogDTO> toBlogDtoCollection(List<Blog> blogs) {
+    public List<BlogPostDTO> toBlogDtoCollection(List<BlogPost> blogs) {
         return blogs.stream().map(this::toBlogDto).toList();
     }
 
-    public List<Blog> fromBlogDtoCollection(List<BlogDTO> blogDtos) {
+    public List<BlogPost> fromBlogDtoCollection(List<BlogPostDTO> blogDtos) {
         return blogDtos.stream().map(this::fromBlogDto).toList();
     }
 
