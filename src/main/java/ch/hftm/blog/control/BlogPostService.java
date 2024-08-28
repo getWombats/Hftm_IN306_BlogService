@@ -5,11 +5,11 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
-import ch.hftm.blog.model.dto.BlogDTO;
-import ch.hftm.blog.model.entity.Blog;
-import ch.hftm.blog.repository.BlogRepository;
+import ch.hftm.blog.model.dto.BlogPostDTO;
+import ch.hftm.blog.model.entity.BlogPost;
+import ch.hftm.blog.repository.BlogPostRepository;
 import ch.hftm.blog.repository.CommentRepository;
-import ch.hftm.blog.service.DtoConverter;
+import ch.hftm.blog.service.BncConverter;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Page;
@@ -18,34 +18,34 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class BlogService {
+public class BlogPostService {
     @Inject
-    BlogRepository blogRepository;
+    BlogPostRepository blogRepository;
 
     @Inject
     CommentRepository commentRepository;
 
     @Inject
-    DtoConverter dtoConverter;
+    BncConverter dtoConverter;
 
-    public List<BlogDTO> getBlogs() {
+    public List<BlogPostDTO> getBlogs() {
         return this.getBlogs(Optional.empty(), Optional.empty());
     }
 
-    public List<BlogDTO> getBlogs(Optional<String> searchString, Optional<Long> page) {
-        PanacheQuery<Blog> blogQuery;
+    public List<BlogPostDTO> getBlogs(Optional<String> searchString, Optional<Long> page) {
+        PanacheQuery<BlogPost> blogQuery;
         if (searchString.isEmpty()) {
             blogQuery = blogRepository.findAll();
         } else {
             blogQuery = blogRepository.find("title like ?1 or content like ?1", "%" + searchString.get() + "%");
         }
 
-        List<Blog> blogs = blogQuery.page(Page.ofSize(20)).list();
+        List<BlogPost> blogs = blogQuery.page(Page.ofSize(20)).list();
         return dtoConverter.toBlogDtoCollection(blogs);
     }
 
-    public BlogDTO getBlogById(long blogId) {
-        Blog foundBlog = blogRepository.findById(blogId);
+    public BlogPostDTO getBlogById(long blogId) {
+        BlogPost foundBlog = blogRepository.findById(blogId);
 
         if (foundBlog == null) {
             Log.warn("Blog with id " + blogId + " not found.");
@@ -56,7 +56,7 @@ public class BlogService {
     }
 
     @Transactional
-    public BlogDTO addBlog(BlogDTO blogDto) {
+    public BlogPostDTO addBlog(BlogPostDTO blogDto) {
 
         blogDto.setCreatedAt(LocalDateTime.now());
 
@@ -67,7 +67,7 @@ public class BlogService {
             return null;
         }
 
-        Blog addedBlog = blogRepository.find("title = ?1 and content = ?2 and authorName = ?3",
+        BlogPost addedBlog = blogRepository.find("title = ?1 and content = ?2 and authorName = ?3",
                 blogDto.getTitle(), blogDto.getContent(), blogDto.getAuthorName()).firstResult();
 
         if (addedBlog == null) {
@@ -79,9 +79,9 @@ public class BlogService {
     }
 
     @Transactional
-    public BlogDTO deleteBlog(long blogId) {
+    public BlogPostDTO deleteBlog(long blogId) {
 
-        Blog blogToBeDeleted = blogRepository.findById(blogId);
+        BlogPost blogToBeDeleted = blogRepository.findById(blogId);
 
         if (blogToBeDeleted == null) {
             Log.warn("Blog with id " + blogId + " not found. No deletion performed.");
@@ -93,16 +93,16 @@ public class BlogService {
     }
 
     @Transactional
-    public BlogDTO replaceBlog(Long replaceBlogId, Long replacementBlogId) {
+    public BlogPostDTO replaceBlog(Long replaceBlogId, Long replacementBlogId) {
 
-        Blog existingBlog = blogRepository.findById(replaceBlogId);
+        BlogPost existingBlog = blogRepository.findById(replaceBlogId);
 
         if (existingBlog == null) {
             Log.warn("Blog to replace with id " + replaceBlogId + " not found. No replacement performed.");
             return null;
         }
 
-        Blog replacementBlog = blogRepository.findById(replacementBlogId);
+        BlogPost replacementBlog = blogRepository.findById(replacementBlogId);
 
         if (replacementBlog == null) {
             Log.warn("Replacing blog with id " + replacementBlogId + " not found. No replacement performed.");
@@ -126,9 +126,9 @@ public class BlogService {
     }
 
     @Transactional
-    public BlogDTO updateBlog(long blogId, BlogDTO updatedBlog) {
+    public BlogPostDTO updateBlog(long blogId, BlogPostDTO updatedBlog) {
 
-        Blog blogToUpdate = blogRepository.findById(blogId);
+        BlogPost blogToUpdate = blogRepository.findById(blogId);
 
         if (blogToUpdate == null) {
             Log.warn("Blog with id " + blogId + " not found. No update performed.");
