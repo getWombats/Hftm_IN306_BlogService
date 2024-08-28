@@ -1,15 +1,15 @@
 package ch.hftm.blog.control;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import ch.hftm.blog.model.domain.ServiceResponse;
 import ch.hftm.blog.model.dto.BlogPostDTO;
 import ch.hftm.blog.model.entity.BlogPost;
 import ch.hftm.blog.repository.BlogPostRepository;
-import ch.hftm.blog.repository.CommentRepository;
-import ch.hftm.blog.service.BncConverter;
+import ch.hftm.blog.util.BncConverter;
+import ch.hftm.blog.util.RequestType;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Page;
@@ -18,130 +18,145 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class BlogPostService {
+public class BlogPostService extends ServiceBase {
     @Inject
     BlogPostRepository blogRepository;
 
-    @Inject
-    CommentRepository commentRepository;
-
-    @Inject
-    BncConverter dtoConverter;
-
-    public List<BlogPostDTO> getBlogs() {
-        return this.getBlogs(Optional.empty(), Optional.empty());
-    }
-
-    public List<BlogPostDTO> getBlogs(Optional<String> searchString, Optional<Long> page) {
+    public ServiceResponse<List<BlogPostDTO>> getAllBlogPostsWithOptionalFiltering(Optional<String> searchString,
+            Optional<Long> page) {
+        ServiceResponse<List<BlogPostDTO>> serviceResponse = new ServiceResponse<>(RequestType.GET);
         PanacheQuery<BlogPost> blogQuery;
-        if (searchString.isEmpty()) {
-            blogQuery = blogRepository.findAll();
-        } else {
-            blogQuery = blogRepository.find("title like ?1 or content like ?1", "%" + searchString.get() + "%");
+
+        try {
+            if (searchString == null || searchString.isEmpty()) {
+                blogQuery = blogRepository.findAll();
+            } else {
+                blogQuery = blogRepository.find("title like ?1 or content like ?1", "%" + searchString.get() + "%");
+            }
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while getting blogs");
+            return serviceResponse;
         }
 
         List<BlogPost> blogs = blogQuery.page(Page.ofSize(20)).list();
-        return dtoConverter.toBlogDtoCollection(blogs);
+        serviceResponse.setData(BncConverter.toBlogDtoCollection(blogs));
+        return serviceResponse;
     }
 
-    public BlogPostDTO getBlogById(long blogId) {
-        BlogPost foundBlog = blogRepository.findById(blogId);
-
-        if (foundBlog == null) {
-            Log.warn("Blog with id " + blogId + " not found.");
-            return null;
-        }
-
-        return dtoConverter.toBlogDto(foundBlog);
-    }
-
-    @Transactional
-    public BlogPostDTO addBlog(BlogPostDTO blogDto) {
-
-        blogDto.setCreatedAt(LocalDateTime.now());
+    public ServiceResponse<BlogPostDTO> getBlogById(long blogId) {
+        ServiceResponse<BlogPostDTO> serviceResponse = new ServiceResponse<>(RequestType.GET);
+        BlogPost foundBlog;
 
         try {
-            blogRepository.persist(dtoConverter.fromBlogDto(blogDto));
-        } catch (Exception e) {
-            Log.error("Error while persisting blog:\n" + e.getClass().getName() + "\n" + e.getMessage());
-            return null;
+            foundBlog = blogRepository.findById(blogId);
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while getting blog with id " + blogId);
+            return serviceResponse;
         }
 
-        BlogPost addedBlog = blogRepository.find("title = ?1 and content = ?2 and authorName = ?3",
-                blogDto.getTitle(), blogDto.getContent(), blogDto.getAuthorName()).firstResult();
-
-        if (addedBlog == null) {
-            Log.error("Error while retrieving added blog.");
-            return null;
+        if (foundBlog == null) {
+            return serviceResponse;
         }
 
-        return dtoConverter.toBlogDto(addedBlog);
+        serviceResponse.setData(BncConverter.toBlogDto(foundBlog));
+        return serviceResponse;
     }
 
     @Transactional
-    public BlogPostDTO deleteBlog(long blogId) {
+    public ServiceResponse<BlogPostDTO> addBlogPost(BlogPostDTO blogDto) {
+        ServiceResponse<BlogPostDTO> serviceResponse = new ServiceResponse<>(RequestType.POST);
+
+        // ? hibernate error / bug?
+        // ? Converting blog with BncConverter as static or service throws
+        // ? IllegalArgumentException
+        // ! Message:
+        // ! Class 'class ch.hftm.blog.util.BncConverter$5' is not an entity
+        // ! classontext-propagation
+        // Blog blogToAdd = BncConverter.toBlogEntity(blogDto);
+
+        // Blog blogToAdd = blogDto.toBlogEntity(); // EntityExistsException
+
+        BlogPost blogToAdd = new BlogPost();
+        blogToAdd.setTitle(blogDto.getTitle());
+        blogToAdd.setContent(blogDto.getContent());
+        blogToAdd.setAuthor(blogDto.getAuthor());
+        blogToAdd.setCreatedAt(Instant.now());
+
+        try {
+            blogRepository.persist(blogToAdd);
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while persisting blog.");
+            return serviceResponse;
+        }
+
+        if (blogRepository.isPersistent(blogToAdd)) {
+            serviceResponse.setData(BncConverter.toBlogDto(blogToAdd));
+        }
+
+        return serviceResponse;
+    }
+
+    @Transactional
+    public ServiceResponse<BlogPostDTO> deleteBlogPost(long blogId) {
+        ServiceResponse<BlogPostDTO> serviceResponse = new ServiceResponse<>(RequestType.DELETE);
 
         BlogPost blogToBeDeleted = blogRepository.findById(blogId);
 
-        if (blogToBeDeleted == null) {
-            Log.warn("Blog with id " + blogId + " not found. No deletion performed.");
-            return null;
+        if (blogToBeDeleted != null) {
+            serviceResponse.setData(BncConverter.toBlogDto(blogToBeDeleted));
         }
 
-        blogRepository.delete(blogToBeDeleted);
-        return dtoConverter.toBlogDto(blogToBeDeleted);
+        try {
+            blogRepository.deleteById(blogId);
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while deleting blog with id " + blogId);
+            return serviceResponse;
+        }
+
+        return serviceResponse;
     }
 
     @Transactional
-    public BlogPostDTO replaceBlog(Long replaceBlogId, Long replacementBlogId) {
-
-        BlogPost existingBlog = blogRepository.findById(replaceBlogId);
-
-        if (existingBlog == null) {
-            Log.warn("Blog to replace with id " + replaceBlogId + " not found. No replacement performed.");
-            return null;
+    public boolean deleteAllBlogPosts() {
+        try {
+            blogRepository.deleteAll();
+        } catch (Exception ex) {
+            Log.error(ex.getMessage(), ex);
+            return false;
         }
 
-        BlogPost replacementBlog = blogRepository.findById(replacementBlogId);
-
-        if (replacementBlog == null) {
-            Log.warn("Replacing blog with id " + replacementBlogId + " not found. No replacement performed.");
-            return null;
-        }
-
-        existingBlog.setTitle(replacementBlog.getTitle());
-        existingBlog.setContent(replacementBlog.getContent());
-        existingBlog.setAuthorName(replacementBlog.getAuthorName());
-        existingBlog.setCreatedAt(replacementBlog.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
-
-        if(replacementBlog.getLastEditedAt() != null){
-            existingBlog.setLastEditedAt(replacementBlog.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
-        } else {
-            existingBlog.setLastEditedAt(null);
-        }
-        
-        blogRepository.persist(existingBlog);
-
-        return dtoConverter.toBlogDto(existingBlog);
+        return true;
     }
 
     @Transactional
-    public BlogPostDTO updateBlog(long blogId, BlogPostDTO updatedBlog) {
+    public ServiceResponse<BlogPostDTO> updateBlogPost(BlogPostDTO blogDto) {
+        ServiceResponse<BlogPostDTO> serviceResponse = new ServiceResponse<>(RequestType.PATCH);
 
-        BlogPost blogToUpdate = blogRepository.findById(blogId);
+        BlogPost blogToUpdate;
+
+        try {
+            blogToUpdate = blogRepository.findById(blogDto.getId());
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while getting blog with id " + blogDto.getId() + " for update.");
+            return serviceResponse;
+        }
 
         if (blogToUpdate == null) {
-            Log.warn("Blog with id " + blogId + " not found. No update performed.");
-            return null;
+            return serviceResponse;
         }
 
-        updatedBlog.setLastEditedAt(LocalDateTime.now());
+        blogToUpdate.setTitle(blogDto.getTitle());
+        blogToUpdate.setContent(blogDto.getContent());
+        blogToUpdate.setLastEditedAt(Instant.now());
 
-        blogToUpdate.setTitle(updatedBlog.getTitle());
-        blogToUpdate.setContent(updatedBlog.getContent());
-        blogToUpdate.setLastEditedAt(updatedBlog.getLastEditedAt().atZone(ZoneId.systemDefault()).toInstant());
+        try {
+            blogRepository.persist(blogToUpdate);
+        } catch (Exception ex) {
+            handleError(serviceResponse, ex, "Error while updating blog with id " + blogToUpdate.getId());
+            return serviceResponse;
+        }
 
-        blogRepository.persist(blogToUpdate);
-        return dtoConverter.toBlogDto(blogToUpdate);
+        serviceResponse.setData(BncConverter.toBlogDto(blogToUpdate));
+        return serviceResponse;
     }
 }
