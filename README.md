@@ -47,9 +47,9 @@ While running, you can press 'o' to toggle the test output and then re-run tests
 
 ![Quarkus test screenshot](images/QuarkusTests.png)
 
-
 ## API Documentation
 
+When the project is running, the documentation can be seen via the  Swagger UI: http://localhost:8080/q/swagger-ui/<br>
 Default Content-Type: <b>application/json</b> (consumes and produces)<br>
 For all POST, PATCH and DELETE requests you will need an access token. When running the project, a keycloak instance will be started automatically via devservices on port 8088.<br>
 
@@ -80,11 +80,11 @@ For all POST, PATCH and DELETE requests you will need an access token. When runn
 
 <!-- When the project is running, the documentation can be seen via the [Swagger UI](http://localhost:8080/q/swagger-ui/) -->
 
+<!------------------------------------------------------------------------------------------------------------------>
+
 ---
 
 ## Available endpoints
-
-<!------------------------------------------------------------------------------------------------------------------>
 
 <details>
 <summary><b>Get all blog posts</b></summary>
@@ -445,21 +445,21 @@ For all POST, PATCH and DELETE requests you will need an access token. When runn
 
 <!------------------------------------------------------------------------------------------------------------------>
 
-<details>
-<summary><b>Getting error responses</b></summary>
+---
+
+#### Getting error responses
 
 Nobody is perfect and sometimes a wild error appears!
-Lucky that we are not getting an empty error response.
+Lucky that we are not getting an empty error response :)
 
-* **Example error response body:**
-    ```json
-    {
-        "traceId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "error": "Error name",
-        "message:": "Problem description"
-    }
-    ```
-</details>
+Example error response body:
+```json
+{
+    "traceId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "error": "Error name",
+    "message:": "Problem description"
+}
+```
 
 <!------------------------------------------------------------------------------------------------------------------>
 
@@ -483,5 +483,6 @@ Lucky that we are not getting an empty error response.
 * [ ] Put all opening curly braces on new line (a hard one)
 * [ ] Implement user accounts corresponding to keycloak accounts OR connect keycloak accounts
 
+<!------------------------------------------------------------------------------------------------------------------>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
