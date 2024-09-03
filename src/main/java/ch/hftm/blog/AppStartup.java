@@ -20,52 +20,25 @@ public class AppStartup {
 
         @PostConstruct
         public void init() {
-                // initializeDummyBlogs();
-                // initializeDummyComments();
+                initializeDummyBlogs();
+                initializeDummyComments();
         }
 
         private void initializeDummyBlogs() {
                 blogService.addBlogPost(
                                 new BlogPostDTO(null,
-                                                "Ich und mein Quarkus",
-                                                "Quarkus ist ein Framework, das auf Java basiert und für die Entwicklung von Cloud-nativen Anwendungen optimiert ist.",
-                                                "Chuck Norris",
+                                                "First Blog Title",
+                                                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+                                                "alice",
                                                 null,
                                                 null,
                                                 null));
 
                 blogService.addBlogPost(
                                 new BlogPostDTO(null,
-                                                "Was sind GET Requests?",
-                                                "GET ist eine Methode, die von einem Client verwendet wird, um Daten von einem Server abzurufen.",
-                                                "Chuck Norris",
-                                                null,
-                                                null,
-                                                null));
-
-                blogService.addBlogPost(
-                                new BlogPostDTO(null,
-                                                "Was ist ein POST Request?",
-                                                "POST ist eine Methode, die von einem Client verwendet wird, um Daten an einen Server zu senden.",
-                                                "Chuck Norris",
-                                                null,
-                                                null,
-                                                null));
-
-                blogService.addBlogPost(
-                                new BlogPostDTO(null,
-                                                "Was ist ein PUT Request?",
-                                                "PUT ist eine Methode, die von einem Client verwendet wird, um Daten an einen Server zu senden und zu ersetzen.",
-                                                "Chuck Norris",
-                                                null,
-                                                null,
-                                                null));
-
-                blogService.addBlogPost(
-                                new BlogPostDTO(null,
-                                                "Was ist ein PATCH Request?",
-                                                "PATCH ist eine Methode, die von einem Client verwendet wird, um Daten an einen Server zu senden und zu aktualisieren.",
-                                                "Chuck Norris",
+                                                "Second Blog Title",
+                                                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+                                                "alice",
                                                 null,
                                                 null,
                                                 null));
@@ -77,8 +50,18 @@ public class AppStartup {
                                                 null,
                                                 null,
                                                 0,
-                                                "Ja Quarkus ist schon ganz gut aber ab und zu verwirrend, vorallem mit hibernate orm...",
-                                                "Chuck Norris",
+                                                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.",
+                                                "alice",
+                                                null,
+                                                null));
+
+                commentService.addCommentToBlog(1,
+                                new CommentDTO(
+                                                null,
+                                                null,
+                                                0,
+                                                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr...",
+                                                "alice",
                                                 null,
                                                 null));
 
@@ -87,8 +70,8 @@ public class AppStartup {
                                                 null,
                                                 null,
                                                 0,
-                                                "PUT Requests sind irgendwie nutzlos. Eine Mischung zwischen POST und PATCH... das Einsatzgebiet dafür erscheint mir nicht ganz plausibel.",
-                                                "Chuck Norris",
+                                                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua",
+                                                "alice",
                                                 null,
                                                 null));
         }
