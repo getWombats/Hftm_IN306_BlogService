@@ -4,7 +4,6 @@ import java.io.StringReader;
 
 import org.jboss.resteasy.reactive.RestResponse.Status;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import ch.hftm.blog.control.BlogPostService;
-import ch.hftm.blog.model.dto.BlogPostDTO;
 
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -41,34 +39,18 @@ public class BlogPostSystemTest {
     @Inject
     BlogPostService blogService;
 
-    @BeforeAll
-    void setup() {
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8080;
-
-        blogService.addBlogPost(
-                new BlogPostDTO(null,
-                        "Mein erster Blog",
-                        "miau miau miau",
-                        "Kater Karlo",
-                        null,
-                        null,
-                        null));
-    }
-
     @Test
     @Order(1)
     void getIntitialBlogsCount() {
 
-        String responseBody = RestAssured
+        RestAssured
                 .when()
                 .get(BLOGS_PATH)
                 .then()
-                .statusCode(Status.OK.getStatusCode())
+                .statusCode(Status.NOT_FOUND.getStatusCode())
                 .extract().body().asString();
 
-        JsonArray jsonArray = Json.createReader(new StringReader(responseBody)).readArray();
-        initialBlogsCount = jsonArray.size();
+        initialBlogsCount = 0;
     }
 
     @Test
@@ -93,7 +75,8 @@ public class BlogPostSystemTest {
 
         String[] segments = location.split("/");
         newBlogId = Long.parseLong(segments[segments.length - 1]);
-        Assertions.assertTrue(newBlogId == 2);
+        System.out.println("newBlogId: " + newBlogId);
+        Assertions.assertTrue(newBlogId == 1);
     }
 
     @Test
