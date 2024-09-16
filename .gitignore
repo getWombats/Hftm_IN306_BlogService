@@ -32,6 +32,7 @@ output-directory/
 
 # IntelliJ
 .idea/
+*.iml
 
 # Java
 *.class
