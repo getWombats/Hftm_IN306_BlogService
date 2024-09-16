@@ -2,6 +2,7 @@ package ch.hftm.blog.boundary;
 
 import java.util.Optional;
 
+import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -28,6 +29,7 @@ public class CommentResource extends ResourceBase {
     CommentService commentService;
 
     @GET
+    @Authenticated
     @Operation(summary = "Get all comments", description = "Returns a collection of comments.")
     @APIResponse(responseCode = "200", description = "Comments found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No comments found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
