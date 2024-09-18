@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
@@ -28,10 +27,22 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build Quarkus Project and Docker Image
-        run: ./mvnw clean package -Dquarkus.profile=prod
+      - name: Set executable permission on mvnw
+        run: chmod +x ./mvnw
+
+      - name: Build Dockerfile
+        run: |
+          if [ -f Dockerfile ]; then
+            docker build -t my-docker-image .
+          else
+            echo "Dockerfile not found, skipping this step"
+          fi
+
+      - name: Build Quarkus Project
+        run: ./mvnw clean package
 
       - name: Push Docker image to GHCR
         run: |
-          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/getwombats/blog-rest-service:1.0.0-SNAPSHOT
-          docker push ghcr.io/getwombats/blog-rest-service:1.0.0-SNAPSHOT
+          GITHUB_USERNAME=$(echo "${{ secrets.GHCR_USERNAME }}" | tr '[:upper:]' '[:lower:]')
+          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/$GITHUB_USERNAME/blog-rest-service:1.0.0-SNAPSHOT
+          docker push ghcr.io/$GITHUB_USERNAME/blog-rest-service:1.0.0-SNAPSHOT
