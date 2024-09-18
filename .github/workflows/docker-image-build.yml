@@ -1,61 +1,32 @@
 name: Build and Push Docker Image to GitHub Container Registry
-
 on:
-  # Trigger the workflow on push to the main branch
   push:
     branches:
       - main
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Manually checkout the repository
       - name: Checkout repository
-        run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git clone ${{ github.repository }} repo
-          cd repo
-
-      # Step 2: Manually set up Docker Buildx
+        uses: actions/checkout@v2
+        
       - name: Set up Docker Buildx
-        run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker buildx create --use
-
-      # Step 3: Log in to GitHub Container Registry
+        uses: docker/setup-buildx-action@v1
+        
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
-
-      # Step 4: Manually set up JDK 21
+        
       - name: Set up JDK 21
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-21-jdk
-          java -version
-
-      # Step 5: Ensure `mvnw` has executable permissions
-      - name: Set executable permission on mvnw
-        run: chmod +x ./mvnw
-
-      # Step 6: Build Dockerfile (if it exists)
-      - name: Build Dockerfile
-        run: |
-          if [ -f Dockerfile ]; then
-            docker build -t my-docker-image .
-          else
-            echo "Dockerfile not found, skipping this step"
-          fi
-
-      # Step 7: Build the Quarkus Project with Maven
-      - name: Build Quarkus Project
-        run: ./mvnw clean package -Dquarkus.profile=prod
-
-      # Step 8: Push the Docker image to GitHub Container Registry (with lowercase username)
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          
+      - name: Build Quarkus Project and Docker Image
+        run: ./mvnw clean package
+        
       - name: Push Docker image to GHCR
         run: |
-          GITHUB_USERNAME=$(echo "${{ secrets.GHCR_USERNAME }}" | tr '[:upper:]' '[:lower:]')
-          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/$GITHUB_USERNAME/blog-rest-service:1.0.0-SNAPSHOT
-          docker push ghcr.io/$GITHUB_USERNAME/blog-rest-service:1.0.0-SNAPSHOT
+          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/${{ secrets.GHCR_USERNAME }}/blog-rest-service:1.0.0-SNAPSHOT
+          docker push ghcr.io/${{ secrets.GHCR_USERNAME }}/blog-rest-service:1.0.0-SNAPSHOT
