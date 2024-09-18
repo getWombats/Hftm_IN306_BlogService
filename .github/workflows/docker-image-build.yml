@@ -9,24 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+        uses: docker/setup-buildx-action@v3
         
       - name: Set up JDK 21
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
           
       - name: Build Quarkus Project and Docker Image
-        run: ./mvnw clean package
+        run: mvn clean package
         
       - name: Push Docker image to GHCR
         run: |
-          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/${{ secrets.GHCR_USERNAME }}/blog-rest-service:1.0.0-SNAPSHOT
-          docker push ghcr.io/${{ secrets.GHCR_USERNAME }}/blog-rest-service:1.0.0-SNAPSHOT
+          docker login ghcr.io -u getWombats --password ${{ secrets.GHCR_TOKEN }}
+          docker tag ch.hftm/blog-rest-service:1.0.0-SNAPSHOT ghcr.io/getwombats/blog-rest-service:1.0.0-SNAPSHOT
+          docker push ghcr.io/getwombats/blog-rest-service:1.0.0-SNAPSHOT
