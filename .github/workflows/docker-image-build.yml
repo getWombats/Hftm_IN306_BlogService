@@ -27,7 +27,7 @@ jobs:
           java-version: '21'
 
       - name: Build Quarkus Project and Docker Image
-        run: ./mvnw clean package
+        run: mvn clean package
         
       - name: Push Docker image to GHCR
         run: |
