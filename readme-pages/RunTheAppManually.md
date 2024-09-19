@@ -1,10 +1,10 @@
 ### [◄ Go back to the Readme](../README.md)
 
-# Run the App
+# Run the app manually
 
 No matter if you are running the project on dev profile or production profile, make sure Docker is running.
 
-## a) Dev-Profile
+## a) With Dev-Profile
 
 Type following command in your VS Code Terminal:
 
@@ -24,7 +24,7 @@ The application-dev.properties file is loaded. The application is starting with 
 Note:
 The services take a while until fully started and available.
 
-## b) Production-Profile
+## b) With Production-Profile
 
 Starting the application with production profile requires a few steps more than the dev profile. Future runs with production profile will happen via a docker compose file.
 
@@ -88,5 +88,5 @@ The best way is to directly use the terminal in your Docker Desktop App. Lets ge
     We have generated the image in the IDE, so Docker already knows whats going on. We can start the image just by executing following command:
 
     ```sh
-    docker run --name blog_api_service --network blog-nw -p 9090:8080 andre/ch.hftm/blog-rest-service:1.0.0-SNAPSHOT
+    docker run --name blog_api_service --network blog-nw -p 9090:8080 andre/ch.hftm/blog-rest-service:latest
     ```
