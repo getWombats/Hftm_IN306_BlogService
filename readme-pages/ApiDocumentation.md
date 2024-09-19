@@ -20,7 +20,7 @@ Keycloak URL: http://keycloak:8180/<br>
 ### Get a Token
 
 Default Content-Type: <b>application/json</b> (consumes and produces)<br>
-For all requests you will need an access token provided by a keycloak instance. When running the project with dev profile, the keycloak instance will be started automatically via devservices on the URL shown above.<br>
+For all requests you will need an access token provided by a keycloak instance. Make sure you request the token on the correct keycloak url **(dev profile url / prod profile url)**<br>
 Edit the URL in the command depending on the profile you start the quarkus server:
 
 * **Get the token for the demo user "alice" (roles: admin, user):**
