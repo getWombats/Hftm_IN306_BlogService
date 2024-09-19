@@ -13,11 +13,13 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 
 ## [► Prerequisites](readme-pages/Prerequisites.md)
 
-## [► Run the app](readme-pages/RunTheApp.md)
+## [► Run the app manually](readme-pages/RunTheAppManually.md)
 
-## [► Run unit and integration tests](readme-pages/Testing.md)
+## [► Run the app with docker compose](readme-pages/RunTheAppDockerCompose.md)
 
 ## [► See the API Documentation](readme-pages/ApiDocumentation.md)
+
+## [► Run unit and integration tests](readme-pages/Testing.md)
 
 <br>
 <br>
@@ -36,10 +38,11 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 * [x] Implemented tests with and without authorization
 * [x] Implemented dev and prod profile
 * [x] Implemented flyway database migration
+* [x] Added github actions workflow yaml for automatically push image to github container registry
+* [x] Added docker compose file to run production profile
 
 # Roadmap
 
-* [ ] Create a docker compose to run production profile
 * [ ] Put all opening curly braces on new line (a hard one)
 * [ ] Pet my guinea pig. unfortunalety i dont have one.
 * [ ] Implement user accounts corresponding to keycloak accounts OR connect keycloak accounts
