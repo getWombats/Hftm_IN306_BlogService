@@ -1,0 +1,88 @@
+services:
+  keycloak-mysql:
+    image: mysql:8.0
+    container_name: keycloak-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: vs4tw
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbuser
+      MYSQL_DATABASE: keycloakdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - keycloak-db:/var/lib/mysql
+    networks:
+      - blog-nw
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  blog-mysql:
+    image: mysql:8.0
+    container_name: blog-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: vs4tw
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbuser
+      MYSQL_DATABASE: blogdb
+    ports:
+      - "3406:3306"
+    volumes:
+      - blog-db:/var/lib/mysql
+    networks:
+      - blog-nw
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8180
+      KC_HOSTNAME_URL: http://keycloak:8180
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://keycloak-mysql:3306/keycloakdb
+      KC_DB_USERNAME: dbuser
+      KC_DB_PASSWORD: dbuser
+    ports:
+      - "8180:8180"
+    volumes:
+      - ./Hftm_IN306_BlogService/src/main/resources/blog-realm.json:/opt/keycloak/data/import/blog-realm.json
+    networks:
+      - blog-nw
+    depends_on:
+      keycloak-mysql:
+        condition: service_healthy
+    command: start-dev --import-realm
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8180"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  blog_api_service:
+    image: ghcr.io/getwombats/blog-rest-service:latest
+    container_name: blog_api_service
+    ports:
+      - "9090:8080"
+    networks:
+      - blog-nw
+    depends_on:
+      blog-mysql:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+networks:
+  blog-nw:
+
+volumes:
+  keycloak-db:
+  blog-db:
