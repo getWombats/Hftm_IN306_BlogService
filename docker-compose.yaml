@@ -62,7 +62,7 @@ services:
         condition: service_healthy
     command: start-dev --import-realm
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8180"]
+      test: ["CMD", "curl", "-f", "http://keycloak:8180"]
       interval: 20s
       timeout: 10s
       retries: 10
@@ -78,7 +78,7 @@ services:
       blog-mysql:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+        condition: service_started
 
 networks:
   blog-nw:
