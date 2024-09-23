@@ -24,12 +24,6 @@ jobs:
           java-version: '21'
           distribution: 'graalvm'
           github-token: ${{ secrets.GHCR_TOKEN }}
-      - name: Example step
-        run: |
-          echo "GRAALVM_HOME: $GRAALVM_HOME"
-          echo "JAVA_HOME: $JAVA_HOME"
-          java --version
-          native-image --version
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -42,7 +36,7 @@ jobs:
         run: mvn clean package -Pnative --define quarkus.native.container-build=true -B
 
       - name: Build Docker image for native binary
-        run: docker build -f src/main/docker/Dockerfile.native -t ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}-native:${{ env.PROJECT_VERSION }} .
+        run: docker build -f src/main/docker/Dockerfile.native -t ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}:${{ env.PROJECT_VERSION }} .
 
       - name: Push Docker image to GitHub Container Registry
-        run: docker push ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}-native:${{ env.PROJECT_VERSION }}
+        run: docker push ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}:${{ env.PROJECT_VERSION }}
