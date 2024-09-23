@@ -39,7 +39,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build Quarkus native image
-        run: mvn clean package -Pnative -Dquarkus.native.container-build=true -B
+        run: mvn clean package -Pnative --define quarkus.native.container-build=true -B
 
       - name: Build Docker image for native binary
         run: docker build -f src/main/docker/Dockerfile.native -t ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}-native:${{ env.PROJECT_VERSION }} .
