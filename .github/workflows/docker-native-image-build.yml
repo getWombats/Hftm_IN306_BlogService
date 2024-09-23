@@ -1,0 +1,48 @@
+name: blog rest service native CI build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PROJECT_NAME: blog-rest-service
+  PROJECT_VERSION: latest
+
+jobs:
+  build-and-push-native-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-repo
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM for native image build
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          cache: maven
+
+      - name: Install native-image tool
+        run: gu install native-image
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build Quarkus native image
+        run: mvn clean package -Pnative -Dquarkus.native.container-build=true -B
+
+      - name: Build Docker image for native binary
+        run: docker build -f src/main/docker/Dockerfile.native -t ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}-native:${{ env.PROJECT_VERSION }} .
+
+      - name: Push Docker image to GitHub Container Registry
+        run: docker push ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}-native:${{ env.PROJECT_VERSION }}
