@@ -54,7 +54,7 @@ services:
     ports:
       - "8180:8180"
     volumes:
-      - ./Hftm_IN306_BlogService/src/main/resources/blog-realm.json:/opt/keycloak/data/import/blog-realm.json
+      - ./src/main/resources/blog-realm.json:/opt/keycloak/data/import/blog-realm.json
     networks:
       - blog-nw
     depends_on:
