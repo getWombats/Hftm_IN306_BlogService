@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN}}
 
       - name: Build Quarkus project
-        run: mvn clean package -DskipTests -B
+        run: mvn clean package -B
 
       - name: Build Docker image
         run: docker build -f src/main/docker/Dockerfile.jvm -t ${{ env.REGISTRY }}/getwombats/${{ env.PROJECT_NAME }}:${{ env.PROJECT_VERSION }} .
