@@ -40,6 +40,7 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 * [x] Implemented flyway database migration
 * [x] Added github actions workflow yaml for automatically push image to github container registry
 * [x] Added docker compose file to run production profile
+* [x] Added github actions workflow yaml for automatically push **native** image to github container registry. Removed non-native workflow build
 
 # Roadmap
 
