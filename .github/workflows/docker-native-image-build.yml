@@ -18,22 +18,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout gh-repo
-        uses: actions/checkout@v3
-
-      - name: Download and install GraalVM
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GHCR_TOKEN }}
+      - name: Example step
         run: |
-          GRAALVM_VERSION=21.3.3  # Replace with the desired GraalVM version
-          GRAALVM_HOME=$HOME/graalvm-ce-java17-$GRAALVM_VERSION
-          wget https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-$GRAALVM_VERSION/graalvm-ce-java17-linux-amd64-$GRAALVM_VERSION.tar.gz
-          tar -xzf graalvm-ce-java17-linux-amd64-$GRAALVM_VERSION.tar.gz -C $HOME
-          echo "GRAALVM_HOME=$GRAALVM_HOME" >> $GITHUB_ENV
-          echo "$GRAALVM_HOME/bin" >> $GITHUB_PATH
-
-      - name: Install native-image tool
-        run: |
-          source $GITHUB_ENV
-          gu install native-image
+          echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          java --version
+          native-image --version
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
