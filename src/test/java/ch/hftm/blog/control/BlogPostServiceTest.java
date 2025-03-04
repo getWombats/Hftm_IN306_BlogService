@@ -43,7 +43,7 @@ public class BlogPostServiceTest {
         @SuppressWarnings("unchecked")
         PanacheQuery<BlogPost> blogQueryMock = Mockito.mock(PanacheQuery.class);
         Mockito.when(blogQueryMock.page(Mockito.any())).thenReturn(blogQueryMock);
-        Mockito.when(blogQueryMock.list()).thenReturn(List.of(new BlogPost(null, "title", "content", "author", Instant.now(), null, null)));
+        Mockito.when(blogQueryMock.list()).thenReturn(List.of(new BlogPost(null, "title", "content", "author", Instant.now(), null, true, null)));
         Mockito.when(blogPostRepositoryMock.findAll()).thenReturn(blogQueryMock);
     }
 
@@ -51,7 +51,7 @@ public class BlogPostServiceTest {
     void listingAndAddingBlog() {
         // Arrange
         int initialBlogsCount = 0;
-        BlogPost blogPost = new BlogPost(1L, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, Instant.now(), null, null);
+        BlogPost blogPost = new BlogPost(1L, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, Instant.now(), null, true, null);
         List<BlogPostDTO> blogs;
 
         // Act
@@ -66,7 +66,7 @@ public class BlogPostServiceTest {
     void deletingBlog() {
         // Arrange
         int initialBlogsCount;
-        BlogPost blogPost = new BlogPost(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, Instant.now(), null, null);
+        BlogPost blogPost = new BlogPost(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, Instant.now(), null, true, null);
         List<BlogPostDTO> blogs;
 
         // Act
@@ -84,7 +84,7 @@ public class BlogPostServiceTest {
     void updatingBlog() {
         // Arrange
         int initialBlogsCount;
-        BlogPostDTO updateBlogPost = new BlogPostDTO(1L, "Updated Blog title", NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null, null);
+        BlogPostDTO updateBlogPost = new BlogPostDTO(1L, "Updated Blog title", NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null, null, true);
         BlogPostDTO updatedBlogPost;
 
         // Act

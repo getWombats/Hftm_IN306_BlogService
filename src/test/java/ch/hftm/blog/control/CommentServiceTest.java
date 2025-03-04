@@ -35,8 +35,7 @@ public class CommentServiceTest {
     void listingAndAddingComment() {
         // Arrange
         CommentDTO commentDTO = new CommentDTO(null, null, null, NEW_COMMENT_CONTENT, NEW_BLOG_AUTHOR, null, null);
-        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null,
-                null);
+        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null, null, true);
         BlogPostDTO addedBlogPost;
         int commentCountBefore;
         List<CommentDTO> comments;
@@ -64,8 +63,7 @@ public class CommentServiceTest {
     void addingAndGettingCommentById() {
         // Arrange
         CommentDTO commentDTO = new CommentDTO(null, null, 0, NEW_COMMENT_CONTENT, NEW_BLOG_AUTHOR, null, null);
-        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null,
-                null);
+        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null, null, true);
         BlogPostDTO addedBlogPost;
         CommentDTO persistedComment;
         CommentDTO foundComment;
@@ -87,8 +85,7 @@ public class CommentServiceTest {
     void addingAndDeletingComment() {
         // Arrange
         CommentDTO commentDTO = new CommentDTO(null, null, null, NEW_COMMENT_CONTENT, NEW_BLOG_AUTHOR, null, null);
-        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null,
-                null);
+        BlogPostDTO blogPostDTO = new BlogPostDTO(null, NEW_BLOG_TITLE, NEW_BLOG_CONTENT, NEW_BLOG_AUTHOR, null, null, null, true);
         BlogPostDTO addedBlogPost;
         CommentDTO commentToBeDeleted;
         int commentCountBefore;

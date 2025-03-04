@@ -29,6 +29,7 @@ public class BlogPost {
     private String author;
     private Instant createdAt;
     private Instant lastEditedAt;
+    private boolean approved;
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments;

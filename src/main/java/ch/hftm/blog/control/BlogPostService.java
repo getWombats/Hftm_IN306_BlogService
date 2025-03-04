@@ -81,6 +81,7 @@ public class BlogPostService extends ServiceBase {
         blogToAdd.setContent(blogDto.getContent());
         blogToAdd.setAuthor(blogDto.getAuthor());
         blogToAdd.setCreatedAt(Instant.now());
+        blogToAdd.setApproved(blogDto.isApproved());
 
         try {
             blogRepository.persist(blogToAdd);
@@ -148,6 +149,7 @@ public class BlogPostService extends ServiceBase {
         blogToUpdate.setTitle(blogDto.getTitle());
         blogToUpdate.setContent(blogDto.getContent());
         blogToUpdate.setLastEditedAt(Instant.now());
+        blogToUpdate.setApproved(blogDto.isApproved());
 
         try {
             blogRepository.persist(blogToUpdate);
