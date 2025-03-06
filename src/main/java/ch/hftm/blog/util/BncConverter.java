@@ -24,6 +24,7 @@ public class BncConverter {
                 setAuthor(blog.getAuthor());
                 setCreatedAt(blog.getCreatedAt());
                 setLastEditedAt(blog.getLastEditedAt());
+                setApproved(blog.isApproved());
                 setComments(toCommentDtoCollection(blog.getComments()));
             }
         }).collect(Collectors.toList());
@@ -77,6 +78,7 @@ public class BncConverter {
                 setAuthor(blog.getAuthor());
                 setCreatedAt(blog.getCreatedAt());
                 setLastEditedAt(blog.getLastEditedAt());
+                setApproved(blog.isApproved());
                 setComments(toCommentDtoCollection(blog.getComments()));
             }
         };
@@ -95,6 +97,7 @@ public class BncConverter {
                 setAuthor(blogDTO.getAuthor());
                 setCreatedAt(blogDTO.getCreatedAt());
                 setLastEditedAt(blogDTO.getLastEditedAt());
+                setApproved(blogDTO.isApproved());
                 setComments(toCommentEntityCollection(blogDTO.getComments()));
             }
         };

@@ -13,9 +13,12 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import ch.hftm.blog.control.BlogPostService;
 import ch.hftm.blog.control.CommentService;
+import ch.hftm.blog.control.ValidationService;
+import ch.hftm.blog.model.domain.ValidationResponse;
 import ch.hftm.blog.model.dto.BlogPostDTO;
 import ch.hftm.blog.model.dto.CommentDTO;
 import ch.hftm.blog.model.dto.ErrorDTO;
+import ch.hftm.blog.util.ResponseFactory;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -47,8 +50,10 @@ public class BlogPostResource extends ResourceBase {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    ValidationService validationService;
+
     @GET
-    @Authenticated
     @Operation(summary = "Get all blog posts", description = "Returns a collection of blog posts.")
     @APIResponse(responseCode = "200", description = "Blog posts found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No blog posts found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -78,10 +83,18 @@ public class BlogPostResource extends ResourceBase {
     @Operation(summary = "Save new blog post", description = "Add a new blog post to database. When successful, returns the created blog post.")
     @RequestBody(description = "Blog post Json. Only title and content are required. Id and createdAt are automatically generated. Comments initially null, comments can not exist befor the blog post.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":0,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"null\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
     @APIResponse(responseCode = "201", description = "Blog post successfully created.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
+    @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "409", description = "Problem while persisting the blog post.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while getting the blog posts.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while persisting blog post.\"}"))
     public Response addBlogPost(@Valid BlogPostDTO blogDTO, @Context UriInfo uriInfo) {
+        ValidationResponse validationResponse = validationService.validateBlogContent(blogDTO.getContent());
+
+        if (!validationResponse.valid()) {
+            return ResponseFactory.createValidationErrorResponse();
+        }
+
         blogDTO.setAuthor(jwt.getName());
+        blogDTO.setApproved(validationResponse.valid());
         return blogService.addBlogPost(blogDTO).createHttpResponse(uriInfo);
     }
 
@@ -118,12 +131,21 @@ public class BlogPostResource extends ResourceBase {
     @Operation(summary = "Update a blog post", description = "Update a blog post's title and content. When successful, returns the updated blog post.")
     @RequestBody(description = "The updated blog post.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"Update: My first blog post\",\"content\":\"This is my first updated blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\",\"comments\":[]}"))
     @APIResponse(responseCode = "200", description = "Blog post was successfully updated.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"Update: My first blog post\",\"content\":\"This is my first updated blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"2024-08-25T15:18:29.610083Z\",\"comments\":[]}"))
+    @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "404", description = "The requested blog post with passed id was not found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while updating the blog post.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while updating blog post.\"}"))
     public Response updateBlogPost(@Valid BlogPostDTO blogDTO) {
         if (blogDTO.getId() == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing Blog-ID.").build();
         }
+
+        ValidationResponse validationResponse = validationService.validateBlogContent(blogDTO.getContent());
+
+        if (!validationResponse.valid()) {
+            return ResponseFactory.createValidationErrorResponse();
+        }
+
+        blogDTO.setApproved(validationResponse.valid());
         return blogService.updateBlogPost(blogDTO).createHttpResponse();
     }
 
@@ -131,6 +153,7 @@ public class BlogPostResource extends ResourceBase {
     @Path("replace/{blogId}")
     @Authenticated
     @Operation(summary = "Replace a blog post => function not implemented", description = "Replace a blog post. This function is not implemented.")
+    @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "501", description = "Function not implemented by the server.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     public Response replaceBlogPost(@PathParam("blogId") Long blogId, BlogPostDTO blogDTO) {
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();

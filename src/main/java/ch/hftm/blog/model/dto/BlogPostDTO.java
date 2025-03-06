@@ -21,4 +21,5 @@ public class BlogPostDTO {
     private Instant createdAt;
     private Instant lastEditedAt;
     private List<CommentDTO> comments;
+    private boolean approved;
 }

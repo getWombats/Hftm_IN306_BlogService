@@ -50,7 +50,8 @@ public class BlogPostSecurityTest {
                         "Kater Karlo",
                         null,
                         null,
-                        null));
+                        null,
+                        true));
         }
 
     @Test

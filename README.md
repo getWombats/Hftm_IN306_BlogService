@@ -6,6 +6,8 @@ Simple REST Service application.
 
 This project is intended to implement the contents of the course IN306 "Verteilte Systeme".
 
+🔥 New: Implemented kafka messaging but without non-blocking mutiny implementation. A POST request is now validated by the [blog-content-validation-service](https://github.com/getWombats/blog-content-validation-service)
+
 <br>
 <br>
 
