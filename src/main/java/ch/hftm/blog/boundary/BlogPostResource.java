@@ -54,7 +54,6 @@ public class BlogPostResource extends ResourceBase {
     ValidationService validationService;
 
     @GET
-    // @Authenticated
     @Operation(summary = "Get all blog posts", description = "Returns a collection of blog posts.")
     @APIResponse(responseCode = "200", description = "Blog posts found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No blog posts found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -66,7 +65,7 @@ public class BlogPostResource extends ResourceBase {
 
     @GET
     @Path("{blogId}")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Get a blog post by its id", description = "Returns a blog post.")
     @APIResponse(responseCode = "200", description = "Blog post found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class)))
     @APIResponse(responseCode = "404", description = "No blog post with supplied id found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -80,7 +79,7 @@ public class BlogPostResource extends ResourceBase {
 
     @POST
     @Path("add")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Save new blog post", description = "Add a new blog post to database. When successful, returns the created blog post.")
     @RequestBody(description = "Blog post Json. Only title and content are required. Id and createdAt are automatically generated. Comments initially null, comments can not exist befor the blog post.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":0,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"null\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
     @APIResponse(responseCode = "201", description = "Blog post successfully created.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
@@ -94,15 +93,14 @@ public class BlogPostResource extends ResourceBase {
             return ResponseFactory.createValidationErrorResponse();
         }
 
-        // blogDTO.setAuthor(jwt.getName());
-        blogDTO.setAuthor("alice");
+        blogDTO.setAuthor(jwt.getName());
         blogDTO.setApproved(validationResponse.valid());
         return blogService.addBlogPost(blogDTO).createHttpResponse(uriInfo);
     }
 
     @DELETE
     @Path("remove/{blogId}")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Delete a blog post by its id", description = "Deletes a blog post by its id. Only the id is required in the path.")
     @APIResponse(responseCode = "204", description = "Blog post was successfully deleted.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "404", description = "The requested blog post with passed id was not found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -129,7 +127,7 @@ public class BlogPostResource extends ResourceBase {
 
     @PATCH
     @Path("update")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Update a blog post", description = "Update a blog post's title and content. When successful, returns the updated blog post.")
     @RequestBody(description = "The updated blog post.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"Update: My first blog post\",\"content\":\"This is my first updated blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\",\"comments\":[]}"))
     @APIResponse(responseCode = "200", description = "Blog post was successfully updated.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"Update: My first blog post\",\"content\":\"This is my first updated blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"2024-08-25T15:18:29.610083Z\",\"comments\":[]}"))
@@ -153,7 +151,7 @@ public class BlogPostResource extends ResourceBase {
 
     @PUT
     @Path("replace/{blogId}")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Replace a blog post => function not implemented", description = "Replace a blog post. This function is not implemented.")
     @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "501", description = "Function not implemented by the server.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -164,7 +162,7 @@ public class BlogPostResource extends ResourceBase {
     // ▼ Comments related to a blog ▼
     @GET
     @Path("{blogId}/comments")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Get all comments from a blog post", description = "Returns a collection of comments from a blog post.")
     @APIResponse(responseCode = "200", description = "Comments found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No comments found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -178,7 +176,7 @@ public class BlogPostResource extends ResourceBase {
 
     @GET
     @Path("{blogId}/comments/{commentId}")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Get a single comment from a blog post", description = "Returns a comment from a blog post by id's of blog and comment.")
     @APIResponse(responseCode = "200", description = "Comments found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class)))
     @APIResponse(responseCode = "404", description = "No comment found. Occurs when blog post was not found or the comment does not exist.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -197,7 +195,7 @@ public class BlogPostResource extends ResourceBase {
 
     @POST
     @Path("{blogId}/comments/add")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Add a new comment to a blog post", description = "Add a new comment to a blog post and save it in database. When successful, returns the created comment.")
     @RequestBody(description = "Comment Json. Only content is required. Id, blogId, commentNumber and createdAt are automatically generated. BlogId is just the reference to the blog the comment is related to.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentDTO.class), example = "{\"id\":0,\"blogId\":\"null\",\"commentNumber\":0,\"content\":\"This is an example comment.\",\"createdAt\":\"null\",\"lastEditedAt\":\"null\"}"))
     @APIResponse(responseCode = "201", description = "Comment successfully created.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class), example = "{\"id\":1,\"blogId\":1,\"commentNumber\":1,\"content\":\"This is an example comment.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\"}"))
@@ -214,7 +212,7 @@ public class BlogPostResource extends ResourceBase {
 
     @DELETE
     @Path("{blogId}/comments/remove/{commentId}")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Delete a comment from a blog post", description = "Deletes a comment from a blog post by the id's of the comment and blog post. Only the id of the comment and the id of the blog post are required in the path.")
     @APIResponse(responseCode = "204", description = "Comment was successfully deleted.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "404", description = "The requested comment or blog post with passed id was not found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -233,7 +231,7 @@ public class BlogPostResource extends ResourceBase {
 
     @PATCH
     @Path("{blogId}/comments/update")
-    // @Authenticated
+    @Authenticated
     @Operation(summary = "Update a comment of a blog post", description = "Update a blog post's comment. When successful, returns the updated comment.")
     @RequestBody(description = "The updated comment.", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class), example = "{\"id\":1,\"blogId\":1,\"commentNumber\":1,\"content\":\"Updated comment example.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\"}"))
     @APIResponse(responseCode = "200", description = "Comment was successfully updated.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = CommentDTO.class), example = "{\"id\":1,\"blogId\":1,\"commentNumber\":1,\"content\":\"Updated comment example.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"2024-08-25T15:18:29.610083Z\"}"))
