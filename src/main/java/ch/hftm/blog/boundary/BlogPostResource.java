@@ -2,6 +2,8 @@ package ch.hftm.blog.boundary;
 
 import java.util.Optional;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -58,6 +60,8 @@ public class BlogPostResource extends ResourceBase {
     @APIResponse(responseCode = "200", description = "Blog posts found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No blog posts found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while getting the blog posts.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while getting blog posts.\"}"))
+    @Counted(value = "blogRequestsCount", description = "Number of blog requests") // Data for metrics in prometheus / grafana
+    @Timed(value = "blogRequestsTime", description = "Time taken to serve blog requests") // Data for metrics in prometheus / grafana
     public Response getAllBlogPostsWithOptionalFiltering(@QueryParam("searchString") Optional<String> searchString,
             @QueryParam("page") Optional<Long> page) {
         return blogService.getAllBlogPostsWithOptionalFiltering(searchString, page).createHttpResponse();
@@ -86,6 +90,8 @@ public class BlogPostResource extends ResourceBase {
     @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "409", description = "Problem while persisting the blog post.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while getting the blog posts.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while persisting blog post.\"}"))
+    @Counted(value = "blogAddedCount", description = "Number of blog added") // Data for metrics in prometheus / grafana
+    @Timed(value = "blogAddedTime", description = "Time taken to add blog") // Data for metrics in prometheus / grafana
     public Response addBlogPost(@Valid BlogPostDTO blogDTO, @Context UriInfo uriInfo) {
         ValidationResponse validationResponse = validationService.validateBlogContent(blogDTO.getContent());
 

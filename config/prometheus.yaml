@@ -10,10 +10,10 @@ rule_files:
 # - "second_rules.yml"
 
 # A scrape configuration containing endpoints to scrape:
-scrape_configs:
- - job_name: 'prometheus'
-   static_configs:
-     - targets: ['host.docker.internal:9090']
+# scrape_configs:
+#  - job_name: 'prometheus'
+#    static_configs:
+#      - targets: ['host.docker.internal:9090']
 
  - job_name: 'quarkus-blog-api'
    metrics_path: '/q/metrics'
