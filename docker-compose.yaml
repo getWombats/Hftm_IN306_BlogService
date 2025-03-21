@@ -1,5 +1,59 @@
+# Docker compose file to run the blog rest api service and all added services / projects from hftm courses 'IN306 Verteilte Systeme' and 'IN311 XML-Verarbeitung'
+
 services:
-  # MySQL Database for Keycloak-Persistence
+
+  # Redpanda kafka messaging broker service container
+  redpanda-broker:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.5
+    container_name: redpanda-broker
+    command:
+      - redpanda
+      - start
+      - --advertise-kafka-addr
+      - redpanda-broker:9092
+    ports:
+      - "9092:9092"
+    networks:
+      - blog-nw
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "nc -z localhost 9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Prometheus time series database container for metrics persistence
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - blog-nw
+    volumes:
+      - "./config/prometheus.yaml:/etc/prometheus/prometheus.yaml"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+    restart: unless-stopped
+
+  # Grafana metrics dashboard webapp container
+  grafana:
+    image: grafana/grafana
+    container_name: grafana_test
+    ports:
+      - "3000:3000"
+    networks:
+      - blog-nw
+    volumes:
+      - grafana_vol:/var/lib/grafana
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MySQL database container for keycloak persistence
   keycloak-mysql:
     image: mysql:8.0
     container_name: keycloak-mysql
@@ -15,12 +69,12 @@ services:
     networks:
       - blog-nw
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 30s
       timeout: 10s
       retries: 5
 
-  # MySQL Database for Blog-Persistence
+  # MySQL database container for blog persistence
   blog-mysql:
     image: mysql:8.0
     container_name: blog-mysql
@@ -36,12 +90,12 @@ services:
     networks:
       - blog-nw
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 30s
       timeout: 10s
       retries: 5
 
-  # Keycloak Auth Service
+  # Keycloak authentication service container
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: keycloak
@@ -65,12 +119,12 @@ services:
         condition: service_healthy
     command: start-dev --import-realm
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://keycloak:8180"]
+      test: [ "CMD", "curl", "-f", "http://keycloak:8180" ]
       interval: 20s
       timeout: 10s
       retries: 10
 
-  # Blog API Service
+  # Quarkus blog api service container
   blog_api_service:
     image: ghcr.io/getwombats/blog-rest-service:latest
     container_name: blog_api_service
@@ -84,7 +138,7 @@ services:
       keycloak:
         condition: service_started
 
-  # Blog Messaging Validation Service
+  # Quarkus blog messaging validation service container
   blog-validation-service:
     image: ghcr.io/getwombats/blog-content-validation-service:latest
     container_name: blog-validation-service
@@ -94,9 +148,13 @@ services:
     networks:
       - blog-nw
 
+# Docker network in which the containers are added to
 networks:
   blog-nw:
+    driver: bridge
 
+# Docker container volumes to map data
 volumes:
+  grafana_vol:
   keycloak-db:
   blog-db:
