@@ -1,4 +1,5 @@
 # Docker compose file to run the blog rest api service and all added services / projects from hftm courses 'IN306 Verteilte Systeme' and 'IN311 XML-Verarbeitung'
+# To configure prometheus, take a look at the prometheus.yaml file in the config folder.
 
 services:
 
@@ -25,7 +26,7 @@ services:
   # Prometheus time series database container for metrics persistence
   prometheus:
     image: prom/prometheus
-    container_name: prometheus
+    container_name: prometheus-monitoring-db
     ports:
       - "9090:9090"
     networks:
@@ -39,7 +40,7 @@ services:
   # Grafana metrics dashboard webapp container
   grafana:
     image: grafana/grafana
-    container_name: grafana_test
+    container_name: grafana-monitoring
     ports:
       - "3000:3000"
     networks:
@@ -98,7 +99,7 @@ services:
   # Keycloak authentication service container
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.2
-    container_name: keycloak
+    container_name: keycloak-auth-service
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -127,9 +128,9 @@ services:
   # Quarkus blog api service container
   blog_api_service:
     image: ghcr.io/getwombats/blog-rest-service:latest
-    container_name: blog_api_service
+    container_name: blog-api-service
     ports:
-      - "9090:8080"
+      - "8080:8080"
     networks:
       - blog-nw
     depends_on:

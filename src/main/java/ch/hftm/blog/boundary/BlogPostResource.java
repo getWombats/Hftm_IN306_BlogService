@@ -2,6 +2,8 @@ package ch.hftm.blog.boundary;
 
 import java.util.Optional;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -58,6 +60,10 @@ public class BlogPostResource extends ResourceBase {
     @APIResponse(responseCode = "200", description = "Blog posts found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "404", description = "No blog posts found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while getting the blog posts.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while getting blog posts.\"}"))
+    @Counted(value = "blogRequestsCount", description = "Number of blog requests") // Data for metrics in prometheus /
+                                                                                   // grafana
+    @Timed(value = "blogRequestsTime", description = "Time taken to serve blog requests") // Data for metrics in
+                                                                                          // prometheus / grafana
     public Response getAllBlogPostsWithOptionalFiltering(@QueryParam("searchString") Optional<String> searchString,
             @QueryParam("page") Optional<Long> page) {
         return blogService.getAllBlogPostsWithOptionalFiltering(searchString, page).createHttpResponse();
@@ -65,7 +71,7 @@ public class BlogPostResource extends ResourceBase {
 
     @GET
     @Path("{blogId}")
-//    @Authenticated
+    // @Authenticated
     @Operation(summary = "Get a blog post by its id", description = "Returns a blog post.")
     @APIResponse(responseCode = "200", description = "Blog post found", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class)))
     @APIResponse(responseCode = "404", description = "No blog post with supplied id found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
@@ -79,29 +85,38 @@ public class BlogPostResource extends ResourceBase {
 
     @POST
     @Path("add")
-//    @Authenticated
+    // @Authenticated
     @Operation(summary = "Save new blog post", description = "Add a new blog post to database. When successful, returns the created blog post.")
     @RequestBody(description = "Blog post Json. Only title and content are required. Id and createdAt are automatically generated. Comments initially null, comments can not exist befor the blog post.", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":0,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"null\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
     @APIResponse(responseCode = "201", description = "Blog post successfully created.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = BlogPostDTO.class), example = "{\"id\":1,\"title\":\"My first blog post\",\"content\":\"This is my first blog post.\",\"createdAt\":\"2024-08-25T15:18:29.610083Z\",\"lastEditedAt\":\"null\",\"comments\":\"null\"}"))
     @APIResponse(responseCode = "400", description = "Most likely the validation of the blog content failed.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "409", description = "Problem while persisting the blog post.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "500", description = "An Error occurred while getting the blog posts.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ErrorDTO.class), example = "{\"traceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"error\":\"ExceptionName\",\"message:\":\"Problem while persisting blog post.\"}"))
+    @Counted(value = "blogAddedCount", description = "Number of blog added") // Data for metrics in prometheus / grafana
+    @Timed(value = "blogAddedTime", description = "Time taken to add blog") // Data for metrics in prometheus / grafana
     public Response addBlogPost(@Valid BlogPostDTO blogDTO, @Context UriInfo uriInfo) {
         ValidationResponse validationResponse = validationService.validateBlogContent(blogDTO.getContent());
 
-        if (!validationResponse.valid()) {
-            return ResponseFactory.createValidationErrorResponse();
+        // if (!validationResponse.valid()) {
+        // return ResponseFactory.createValidationErrorResponse();
+        // }
+
+        String authorName = jwt.getName();
+
+        if (authorName != null) {
+            blogDTO.setAuthor(jwt.getName());
+        } else {
+            blogDTO.setAuthor("alice"); // Set default authos when auth is disabled
         }
 
-//        blogDTO.setAuthor(jwt.getName());
-        blogDTO.setAuthor("alice");
         blogDTO.setApproved(validationResponse.valid());
+        // blogDTO.setApproved(true);
         return blogService.addBlogPost(blogDTO).createHttpResponse(uriInfo);
     }
 
     @DELETE
     @Path("remove/{blogId}")
-//    @Authenticated
+    // @Authenticated
     @Operation(summary = "Delete a blog post by its id", description = "Deletes a blog post by its id. Only the id is required in the path.")
     @APIResponse(responseCode = "204", description = "Blog post was successfully deleted.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
     @APIResponse(responseCode = "404", description = "The requested blog post with passed id was not found.", content = @Content(mediaType = MediaType.TEXT_PLAIN))
