@@ -26,7 +26,7 @@ services:
   # Prometheus time series database container for metrics persistence
   prometheus:
     image: prom/prometheus
-    container_name: prometheus-monitoring-db
+    container_name: prometheus-timeseries-db
     ports:
       - "9090:9090"
     networks:
