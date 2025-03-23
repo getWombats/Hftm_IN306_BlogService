@@ -23,6 +23,8 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 
 ## [► Run unit and integration tests](readme-pages/Testing.md)
 
+## [► Run the project with observability tools](readme-pages/RunWithObservabilityTools.md)
+
 <br>
 <br>
 
@@ -48,6 +50,5 @@ This project is intended to implement the contents of the course IN306 "Verteilt
 
 * [ ] Put all opening curly braces on new line (a hard one)
 * [ ] Pet my guinea pig. unfortunalety i dont have one.
-* [ ] Implement user accounts corresponding to keycloak accounts OR connect keycloak accounts
 
 <!------------------------------------------------------------------------------------------------------------------>
